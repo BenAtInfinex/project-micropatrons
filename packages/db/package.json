@@ -9,7 +9,10 @@
     "build": "tsc",
     "start": "node index.ts",
     "dev": "tsx watch index.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "reset": "tsx scripts/reset-db.ts",
+    "reset-and-seed": "tsx scripts/reset-db.ts && tsx scripts/seed.ts",
+    "db-info": "tsx -e \"import { getDatabaseInfo } from './src/database.js'; getDatabaseInfo();\""
   },
   "dependencies": {
     "cors": "^2.8.5",

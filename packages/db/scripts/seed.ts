@@ -1,8 +1,13 @@
-import sqlite3 from "sqlite3";
-import path from "path";
+// seed.ts
 import crypto from "crypto";
+import { getDatabase, getDatabaseInfo } from "../src/database.js";
 
-const db = new sqlite3.Database(path.join(__dirname, "..", "micropatrons.db"));
+// Get database instance
+const db = getDatabase();
+
+// Show where we're seeding
+console.log("Database information:");
+getDatabaseInfo();
 
 // Sample usernames
 const sampleUsers = [
@@ -51,7 +56,7 @@ const sampleUsers = [
   "Snowwhite",
   "Spud",
   "Taobao",
-  "Thor", // Adding Thor for the transfer
+  "Thor",
   "Tuna",
   "Vader",
   "Walker",
@@ -63,10 +68,12 @@ const sampleUsers = [
 console.log("Seeding database...");
 
 db.serialize(() => {
-  // Create tables if they don't exist
   console.log("Creating tables...");
 
-  // Users table with UUID
+  // Keep FK constraints honest
+  db.run(`PRAGMA foreign_keys = ON`);
+
+  // Users table with starting balance 200,000
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -89,7 +96,6 @@ db.serialize(() => {
     )
   `);
 
-  // Create index on activity timestamp for faster queries
   db.run(`
     CREATE INDEX IF NOT EXISTS idx_activity_timestamp 
     ON activity(timestamp DESC)
@@ -109,157 +115,106 @@ db.serialize(() => {
 
       console.log("Cleared existing data");
 
-      // Insert sample users with UUIDs
-      const stmt = db.prepare(
-        "INSERT INTO users (id, username, balance) VALUES (?, ?, ?)",
-      );
-      const userIds: { [username: string]: string } = {};
+      // Begin atomic write
+      db.exec("BEGIN TRANSACTION", (beginErr) => {
+        if (beginErr) {
+          console.error("Error beginning transaction:", beginErr);
+          process.exit(1);
+        }
 
-      sampleUsers.forEach((username, index) => {
-        const userId = crypto.randomUUID();
-        userIds[username] = userId;
+        // Insert sample users with UUIDs and starting balance 200,000
+        const insertUser = db.prepare(
+          "INSERT INTO users (id, username, balance) VALUES (?, ?, ?)",
+        );
+        const userIds: Record<string, string> = {};
 
-        stmt.run(userId, username, 200000, (err) => {
-          if (err) {
-            console.error(`Error inserting user ${username}:`, err);
-          } else {
-            console.log(`Inserted user: ${username} (ID: ${userId})`);
-          }
+        sampleUsers.forEach((username, index) => {
+          const userId = crypto.randomUUID();
+          userIds[username] = userId;
 
-          // After all users are inserted, create some sample activities
-          if (index === sampleUsers.length - 1) {
-            stmt.finalize(() => {
-              console.log("\nCreating sample transfers...");
+          insertUser.run(userId, username, 200000, (err2) => {
+            if (err2) {
+              console.error(`Error inserting user ${username}:`, err2);
+            } else {
+              console.log(`Inserted user: ${username} (ID: ${userId})`);
+            }
 
-              // Create transfers to Ben
-              const transfers = [
-                { from: "Hatake", to: "Ben", amount: 20000 },
-                { from: "Pandas", to: "Ben", amount: 20000 },
-                { from: "Dune", to: "Ben", amount: 20000 },
-                { from: "Thor", to: "Ben", amount: 20000 },
-                { from: "Equinox", to: "Ben", amount: 20000 },
-              ];
+            if (index === sampleUsers.length - 1) {
+              insertUser.finalize(() => {
+                console.log("\nCreating 5 transfers to Ben...");
 
-              const activityStmt = db.prepare(
-                "INSERT INTO activity (id, from_user_id, to_user_id, amount) VALUES (?, ?, ?, ?)",
-              );
-              const updateStmt = db.prepare(
-                "UPDATE users SET balance = balance + ? WHERE id = ?",
-              );
+                const transfers = [
+                  { from: "Hatake", to: "Ben", amount: 20000 },
+                  { from: "Pandas", to: "Ben", amount: 20000 },
+                  { from: "Dune", to: "Ben", amount: 20000 },
+                  { from: "Thor", to: "Ben", amount: 20000 },
+                  { from: "Equinox", to: "Ben", amount: 20000 },
+                ];
 
-              transfers.forEach((transfer, tIndex) => {
-                const activityId = crypto.randomUUID();
-                const fromUserId = userIds[transfer.from];
-                const toUserId = userIds[transfer.to];
-
-                // Create activity record
-                activityStmt.run(
-                  activityId,
-                  fromUserId,
-                  toUserId,
-                  transfer.amount,
+                const insertActivity = db.prepare(
+                  "INSERT INTO activity (id, from_user_id, to_user_id, amount) VALUES (?, ?, ?, ?)",
+                );
+                const updateBalance = db.prepare(
+                  "UPDATE users SET balance = balance + ? WHERE id = ?",
                 );
 
-                // Update balances
-                updateStmt.run(-transfer.amount, fromUserId);
-                updateStmt.run(transfer.amount, toUserId);
+                transfers.forEach((t, tIndex) => {
+                  const fromId = userIds[t.from];
+                  const toId = userIds[t.to];
 
-                console.log(
-                  `Created transfer: ${transfer.from} → ${transfer.to}: ${transfer.amount} micropatrons`,
-                );
+                  if (!fromId || !toId) {
+                    console.error(
+                      `Missing user ID(s) for transfer ${t.from} -> ${t.to}`,
+                    );
+                    return;
+                  }
 
-                if (tIndex === transfers.length - 1) {
-                  activityStmt.finalize();
-                  updateStmt.finalize(() => {
-                    console.log("\nCreating historical activity data...");
+                  const activityId = crypto.randomUUID();
 
-                    // Create some historical transfers for the past 30 days
-                    const historicalTransfers = [];
-                    const usernames = Object.keys(userIds);
+                  // Record activity
+                  insertActivity.run(activityId, fromId, toId, t.amount);
 
-                    // Generate 3-10 random transfers per day for the past 30 days
-                    for (let daysAgo = 30; daysAgo >= 0; daysAgo--) {
-                      const transfersPerDay = Math.floor(Math.random() * 8) + 3;
+                  // Adjust balances
+                  updateBalance.run(-t.amount, fromId);
+                  updateBalance.run(t.amount, toId);
 
-                      for (let i = 0; i < transfersPerDay; i++) {
-                        const fromUser =
-                          usernames[
-                            Math.floor(Math.random() * usernames.length)
-                          ];
-                        let toUser =
-                          usernames[
-                            Math.floor(Math.random() * usernames.length)
-                          ];
+                  console.log(
+                    `Created transfer: ${t.from} → ${t.to}: ${t.amount} µPatrons`,
+                  );
 
-                        // Ensure sender and receiver are different
-                        while (toUser === fromUser) {
-                          toUser =
-                            usernames[
-                              Math.floor(Math.random() * usernames.length)
-                            ];
+                  if (tIndex === transfers.length - 1) {
+                    insertActivity.finalize();
+                    updateBalance.finalize(() => {
+                      // Commit atomic write
+                      db.exec("COMMIT", (commitErr) => {
+                        if (commitErr) {
+                          console.error(
+                            "Error committing transaction:",
+                            commitErr,
+                          );
+                          // Try to roll back if commit failed
+                          db.exec("ROLLBACK", () => {
+                            db.close();
+                          });
+                          return;
                         }
 
-                        const amount = Math.floor(Math.random() * 5000) + 100; // 100-5100 µPatrons
-                        const date = new Date();
-                        date.setDate(date.getDate() - daysAgo);
-                        date.setHours(
-                          Math.floor(Math.random() * 24),
-                          Math.floor(Math.random() * 60),
-                          Math.floor(Math.random() * 60),
-                        );
-
-                        historicalTransfers.push({
-                          id: crypto.randomUUID(),
-                          from: fromUser,
-                          to: toUser,
-                          amount: amount,
-                          timestamp: date.toISOString(),
+                        db.close(() => {
+                          console.log("\nDatabase seeded successfully!");
+                          console.log(
+                            `Created ${sampleUsers.length} users and ${transfers.length} total transfers`,
+                          );
+                          console.log(
+                            "All users start at 200,000; Ben receives 100,000 from 5 senders.",
+                          );
                         });
-                      }
-                    }
-
-                    // Insert historical transfers
-                    const histStmt = db.prepare(
-                      "INSERT INTO activity (id, from_user_id, to_user_id, amount, timestamp) VALUES (?, ?, ?, ?, ?)",
-                    );
-                    let insertedCount = 0;
-
-                    historicalTransfers.forEach((transfer, index) => {
-                      const fromUserId = userIds[transfer.from];
-                      const toUserId = userIds[transfer.to];
-
-                      histStmt.run(
-                        transfer.id,
-                        fromUserId,
-                        toUserId,
-                        transfer.amount,
-                        transfer.timestamp,
-                        (err) => {
-                          if (!err) {
-                            insertedCount++;
-                          }
-
-                          if (index === historicalTransfers.length - 1) {
-                            histStmt.finalize(() => {
-                              db.close(() => {
-                                console.log(
-                                  `Created ${insertedCount} historical transfers`,
-                                );
-                                console.log("\nDatabase seeded successfully!");
-                                console.log(
-                                  `Created ${sampleUsers.length} users and ${transfers.length + insertedCount} total transfers`,
-                                );
-                              });
-                            });
-                          }
-                        },
-                      );
+                      });
                     });
-                  });
-                }
+                  }
+                });
               });
-            });
-          }
+            }
+          });
         });
       });
     });

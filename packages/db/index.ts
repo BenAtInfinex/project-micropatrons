@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
-import sqlite3 from "sqlite3";
 import cors from "cors";
-import path from "path";
 import crypto from "crypto";
+import { getDatabase, getDatabaseInfo } from "./src/database.js";
 
 const app = express();
 const PORT = process.env.PORT || 5173;
@@ -42,7 +41,11 @@ interface TransferResponse {
 }
 
 // Database setup
-const db = new sqlite3.Database(path.join(__dirname, "..", "micropatrons.db"));
+const db = getDatabase();
+
+// Log database location on startup
+console.log("Starting server...");
+getDatabaseInfo();
 
 // Create tables if they don't exist
 db.serialize(() => {
