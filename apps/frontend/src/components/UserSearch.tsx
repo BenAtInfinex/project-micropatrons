@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { User } from '../types';
 import { api } from '../api/api';
+import { formatMicropatrons } from '../utils/formatters';
 
 interface UserSearchProps {
   onUserSelect: (username: string) => void;
@@ -89,7 +90,7 @@ export const UserSearch: React.FC<UserSearchProps> = ({
                 onClick={() => handleSelect(user.username)}
               >
                 <span className="username">{user.username}</span>
-                <span className="balance">{user.balance.toLocaleString()} micropatrons</span>
+                <span className="balance">{formatMicropatrons(user.balance)}</span>
               </div>
             ))}
           </div>

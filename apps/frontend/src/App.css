@@ -45,25 +45,74 @@ body {
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Top Section - Leaderboard and Charts */
+.top-section {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 2rem;
-  height: 100%;
 }
 
-@media (max-width: 1024px) {
-  .container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.left-panel, .right-panel {
+.leaderboard-section, .charts-section {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.chart-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Middle Section - Transfer and Activity */
+.middle-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.transfer-section, .activity-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Bottom Section - User List */
+.bottom-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .top-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .middle-section {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Transfer Form Styles */
@@ -395,6 +444,90 @@ body {
   color: #a0aec0;
   padding: 2rem;
   font-style: italic;
+}
+
+/* Leaderboard Styles */
+.leaderboard h2 {
+  color: #4a5568;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.leaderboard-item.top-1 {
+  background: linear-gradient(135deg, #fff8dc 0%, #ffd700 100%);
+  border-color: #ffd700;
+}
+
+.leaderboard-item.top-2 {
+  background: linear-gradient(135deg, #f0f0f0 0%, #c0c0c0 100%);
+  border-color: #c0c0c0;
+}
+
+.leaderboard-item.top-3 {
+  background: linear-gradient(135deg, #faebd7 0%, #cd7f32 100%);
+  border-color: #cd7f32;
+}
+
+.leaderboard-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-item .rank {
+  font-size: 1.5rem;
+  font-weight: bold;
+  min-width: 50px;
+  text-align: center;
+}
+
+.leaderboard-item .user-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leaderboard-item .username {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #2d3748;
+}
+
+.leaderboard-item .balance-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.leaderboard-item .micropatrons {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+}
+
+.leaderboard-item .dollars {
+  font-size: 0.875rem;
+  color: #718096;
 }
 
 /* Scrollbar Styles */

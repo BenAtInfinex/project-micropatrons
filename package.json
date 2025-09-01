@@ -1,18 +1,27 @@
 {
-  "name": "micropatrons",
+  "name": "@infinex/upatron-monorepo",
+  "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "Micropatrons currency transfer application",
   "scripts": {
-    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "backend": "cd backend && npm run dev",
-    "frontend": "cd frontend && npm start",
-    "seed": "cd backend && npm run seed",
-    "setup": "npm run install-all && npm run seed",
-    "start": "npm run dev",
-    "kill-ports": "lsof -ti:5000,3000 | xargs kill -9 2>/dev/null || echo 'Ports cleared'"
+    "auth:npm": "npx google-artifactregistry-auth --credential-config \"$HOME/.npmrc\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@infinex/prettier-config": "0.0.0",
+    "@typescript/analyze-trace": "^0.10.1",
+    "@vitest/coverage-istanbul": "^2.1.3",
+    "google-artifactregistry-auth": "^3.3.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-packagejson": "^2.5.14",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "tsx": "^4.7.2",
+    "turbo": "^2.0.9",
+    "type-fest": "^4.26.1",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@9.12.1",
+  "engines": {
+    "node": "^20"
   }
 }

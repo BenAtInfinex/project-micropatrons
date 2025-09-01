@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity } from '../types';
 import { api } from '../api/api';
+import { formatMicropatrons } from '../utils/formatters';
 
 interface ActivityListProps {
   refreshTrigger: number;
@@ -67,7 +68,7 @@ export const ActivityList: React.FC<ActivityListProps> = ({ refreshTrigger }) =>
                 <span className="activity-to">{activity.to_username}</span>
               </div>
               <div className="activity-details">
-                <span className="activity-amount">{activity.amount.toLocaleString()} micropatrons</span>
+                <span className="activity-amount">{formatMicropatrons(activity.amount)}</span>
                 <span className="activity-time">{formatTimestamp(activity.timestamp)}</span>
               </div>
             </div>

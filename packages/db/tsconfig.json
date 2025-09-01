@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "@infinex/tsconfig/index.json"
+  ],
+  "compilerOptions": {
+    "types": [
+      "@types/node"
+    ]
+  },
+  "include": [
+    "*.ts",
+    "*.js",
+    "*.cjs",
+    "schema/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "exclude": []
+}

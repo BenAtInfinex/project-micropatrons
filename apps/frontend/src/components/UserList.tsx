@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User } from '../types';
 import { api } from '../api/api';
+import { formatWithDollars } from '../utils/formatters';
 
 interface UserListProps {
   refreshTrigger: number;
@@ -46,8 +47,8 @@ export const UserList: React.FC<UserListProps> = ({ refreshTrigger }) => {
           <span className="stat-value">{users.length}</span>
         </div>
         <div className="stat-item">
-          <span className="stat-label">Total Micropatrons:</span>
-          <span className="stat-value">{totalBalance.toLocaleString()}</span>
+          <span className="stat-label">Total µPatrons:</span>
+          <span className="stat-value">{formatWithDollars(totalBalance)}</span>
         </div>
       </div>
 
@@ -67,7 +68,7 @@ export const UserList: React.FC<UserListProps> = ({ refreshTrigger }) => {
           {filteredUsers.map((user) => (
             <div key={user.id} className="user-card">
               <h3>{user.username}</h3>
-              <p className="balance">{user.balance.toLocaleString()} micropatrons</p>
+              <p className="balance">{formatWithDollars(user.balance)}</p>
             </div>
           ))}
         </div>

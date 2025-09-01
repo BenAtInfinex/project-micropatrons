@@ -339,6 +339,29 @@ app.get("/api/users/:username/activity", (req: Request, res: Response) => {
   );
 });
 
+// Get activity statistics over time
+app.get("/api/activity/stats", (req: Request, res: Response) => {
+  const { days = 7 } = req.query;
+
+  const query = `
+    SELECT 
+      DATE(timestamp) as date,
+      COUNT(*) as transfers,
+      SUM(amount) as volume
+    FROM activity
+    WHERE timestamp >= DATE('now', '-' || ? || ' days')
+    GROUP BY DATE(timestamp)
+    ORDER BY date ASC
+  `;
+
+  db.all(query, [Number(days)], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -13,7 +13,7 @@ export interface Activity {
   timestamp: string;
   from_username?: string;
   to_username?: string;
-  type?: 'sent' | 'received';
+  type?: "sent" | "received";
 }
 
 export interface TransferFormData {

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["ENV"],
+  "globalEnv": ["NODE_ENV"],
+  "concurrency": "100%",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true
+    },
+    "check:format": {},
+    "check:lint": {},
+    "check:types": {
+      "dependsOn": ["^build"]
+    },
+    "fix:lint": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "test:unit": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "test:integration": {
+      "cache": false,
+      "dependsOn": ["^build"]
+    },
+    "docker-compose:up": {
+      "cache": false
+    },
+    "docker-compose:down": {
+      "cache": false
+    }
+  }
+}
