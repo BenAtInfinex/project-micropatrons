@@ -126,12 +126,8 @@ const csp = new CSPBuilder()
     "unpkg.com",
     "fonts.gstatic.com",
     "*.sentry.io",
+    "http://localhost:5173",
   ])
-  .add("frame-src", [
-    "'self'",
-    ...(!isNodeProduction ? [envHeader("VITE_WEBAUTHN_IFRAME_SRC")] : []),
-  ])
-  .add("frame-ancestors", ["'self'", envHeader("VITE_DAPP_ORIGINS")])
   .add("worker-src", ["blob:"])
   .add("frame-src", ["https://challenges.cloudflare.com"])
   .add("report-to", ["csp-endpoint"]);
@@ -161,10 +157,6 @@ export const headers = {
     {
       key: "Content-Security-Policy",
       value: csp.build(),
-    },
-    {
-      key: "Reporting-Endpoints",
-      value: `csp-endpoint=${envHeader("VITE_CSP_REPORTING_ENDPOINT")}`,
     },
     {
       key: "Permissions-Policy",

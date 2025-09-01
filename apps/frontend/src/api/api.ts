@@ -91,4 +91,32 @@ export const api = {
     
     return Promise.resolve(stats);
   },
+
+  async reportOpSecIssue(data: { victim: string; attacker: string }): Promise<{ message: string; success: boolean }> {
+    // This will transfer 20,000 micropatrons from attacker to victim
+    const transferData = {
+      sender: data.attacker,
+      receiver: data.victim,
+      amount: 20000
+    };
+
+    const response = await fetch(`${API_BASE_URL}/transfer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(transferData),
+    });
+
+    if (!response.ok) {
+      const error: ErrorResponse = await response.json();
+      throw new Error(error.error || "OpSec report failed");
+    }
+
+    const result = await response.json();
+    return {
+      message: `OpSec issue reported successfully. ${data.attacker} has been penalized 20,000 µPatrons which have been transferred to ${data.victim}.`,
+      success: true
+    };
+  },
 };
