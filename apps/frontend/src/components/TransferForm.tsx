@@ -61,10 +61,10 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
   };
 
   return (
-    <div className="transfer-form">
-      <h2>Transfer Micropatrons</h2>
+    <div className="bg-surface rounded-3xl p-6">
+      <h2 className="title-lg-semibold text-emphasis mb-6">Transfer Micropatrons</h2>
       
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <UserSearch
           label="From (Sender)"
           placeholder="Search for sender..."
@@ -79,8 +79,10 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
           onUserSelect={(username) => setFormData({ ...formData, receiver: username })}
         />
 
-        <div className="form-group">
-          <label htmlFor="amount">Amount</label>
+        <div className="space-y-2">
+          <label htmlFor="amount" className="body-sm-semibold text-emphasis block">
+            Amount
+          </label>
           <input
             type="number"
             id="amount"
@@ -89,13 +91,26 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
             placeholder="Enter amount to transfer"
             min="1"
             step="1"
+            className="w-full px-4 py-3 bg-background border border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
           />
         </div>
 
-        {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">{success}</div>}
+        {error && (
+          <div className="bg-negative/10 border border-negative/20 text-negative rounded-xl px-4 py-3 body-sm-normal">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-positive/10 border border-positive/20 text-positive rounded-xl px-4 py-3 body-sm-normal">
+            {success}
+          </div>
+        )}
 
-        <button type="submit" disabled={loading} className="submit-btn">
+        <button 
+          type="submit" 
+          disabled={loading} 
+          className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl body-base-semibold hover:bg-primary-hover active:bg-primary-pressed disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
           {loading ? 'Processing...' : 'Transfer'}
         </button>
       </form>

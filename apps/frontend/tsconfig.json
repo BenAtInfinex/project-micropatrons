@@ -1,26 +1,70 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    /* Basic Options */
+    "target": "esnext",
+    "module": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "webworker"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "outDir": "./lib",
+    "composite": false,
+    "removeComments": true,
     "isolatedModules": true,
+    "resolveJsonModule": true,
+    /* Strict Type-Checking Options */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    /* Additional Checks */
+    "noUnusedLocals": false,
+    /* Module Resolution Options */
+    "moduleResolution": "bundler",
+    "baseUrl": "./src",
+    "typeRoots": [
+      "./src/@types",
+      "./node_modules/@types",
+      "./node_modules"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    /* Experimental Options */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    /* Advanced Options */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "noFallthroughCasesInSwitch": true,
+    "types": [
+      "vite/client",
+      "chrome"
+    ],
+    "allowUmdGlobalAccess": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/test-helpers/*": [
+        "../integration-tests/src/helpers/*"
+      ]
+    }
   },
   "include": [
-    "../apps/frontend/src"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "secrets.ts"
   ]
 }

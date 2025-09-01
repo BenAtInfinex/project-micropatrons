@@ -73,6 +73,7 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({ refreshTrigger }) 
 
   const options: ChartOptions<'line'> = {
     responsive: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index' as const,
       intersect: false,
@@ -82,8 +83,7 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({ refreshTrigger }) 
         position: 'top' as const,
       },
       title: {
-        display: true,
-        text: 'Activity Over Time (Last 30 Days)'
+        display: false
       }
     },
     scales: {
@@ -117,12 +117,19 @@ export const ActivityChart: React.FC<ActivityChartProps> = ({ refreshTrigger }) 
   };
 
   if (loading || !chartData) {
-    return <div className="loading">Loading activity chart...</div>;
+    return (
+      <div className="bg-surface rounded-3xl p-6 h-full flex items-center justify-center">
+        <div className="body-base-normal text-secondary">Loading activity chart...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="activity-chart">
-      <Line options={options} data={chartData} />
+    <div className="bg-surface rounded-3xl p-6 h-full">
+      <h3 className="title-base-semibold text-emphasis mb-4">Activity (Last 30 Days)</h3>
+      <div className="h-[300px]">
+        <Line options={options} data={chartData} />
+      </div>
     </div>
   );
 };

@@ -73,4 +73,22 @@ export const api = {
     }
     return response.json();
   },
+
+  async getActivityStats(days = 30): Promise<{ date: string; transfers: number; volume: number }[]> {
+    // Mock data for now since the backend doesn't have this endpoint yet
+    const stats = [];
+    const now = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      stats.push({
+        date: date.toISOString().split('T')[0],
+        transfers: Math.floor(Math.random() * 20) + 5,
+        volume: Math.floor(Math.random() * 1000000) + 100000,
+      });
+    }
+    
+    return Promise.resolve(stats);
+  },
 };

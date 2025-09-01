@@ -1,0 +1,17 @@
+@import "@infinex/ui-fonts/src/index.css";
+@import "@infinex/ui-css-reset/src/index.css";
+@import "@infinex/ui/styles/utilities.css";
+@import "@infinex/web-shared/components.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Typography
+ */
+
+.infinex-prose {
+  @apply prose prose-thead:border-b-subtle prose-th:align-middle prose-th:leading-tight prose-th:text-left prose-table:text-default prose-sm md:prose-base prose-p:text-default prose-a:text-emphasis prose-a:underline hover:prose-a:no-underline prose-em:italic prose-code:text-emphasis prose-pre:bg-surfaceOne prose-headings:text-emphasis prose-headings:font-semibold prose-strong:font-bold prose-strong:text-default prose-li:text-default prose-img:rounded prose-hr:border-subtle prose-p:leading-normal prose-li:leading-normal prose-tr:border-b-subtle max-w-none [&_:first-child]:mt-0;
+}
+

@@ -61,9 +61,9 @@ export const UserSearch: React.FC<UserSearchProps> = ({
   };
 
   return (
-    <div className="user-search">
-      {label && <label>{label}</label>}
-      <div className="search-container">
+    <div className="space-y-2">
+      {label && <label className="body-sm-semibold text-emphasis block">{label}</label>}
+      <div className="relative">
         <input
           type="text"
           value={search}
@@ -72,25 +72,30 @@ export const UserSearch: React.FC<UserSearchProps> = ({
             setShowDropdown(true);
           }}
           onFocus={() => setShowDropdown(true)}
+          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
           placeholder={placeholder}
-          className="search-input"
+          className="w-full px-4 py-3 bg-background border border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
         />
         
         {showDropdown && search && (
-          <div className="dropdown">
-            {loading && <div className="dropdown-item">Loading...</div>}
-            {error && <div className="dropdown-item error">{error}</div>}
+          <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-subtle rounded-xl shadow-lg overflow-hidden z-10">
+            {loading && (
+              <div className="px-4 py-3 body-sm-normal text-secondary">Loading...</div>
+            )}
+            {error && (
+              <div className="px-4 py-3 body-sm-normal text-negative">{error}</div>
+            )}
             {!loading && !error && users.length === 0 && (
-              <div className="dropdown-item">No users found</div>
+              <div className="px-4 py-3 body-sm-normal text-secondary">No users found</div>
             )}
             {!loading && !error && users.map((user) => (
               <div
                 key={user.id}
-                className="dropdown-item"
+                className="px-4 py-3 hover:bg-surfaceTwo cursor-pointer transition-colors flex justify-between items-center"
                 onClick={() => handleSelect(user.username)}
               >
-                <span className="username">{user.username}</span>
-                <span className="balance">{formatMicropatrons(user.balance)}</span>
+                <span className="body-base-semibold text-emphasis">{user.username}</span>
+                <span className="body-sm-normal text-secondary">{formatMicropatrons(user.balance)}</span>
               </div>
             ))}
           </div>

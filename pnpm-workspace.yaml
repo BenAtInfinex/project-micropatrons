@@ -1,3 +1,18 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+catalog:
+  "@infinex/chain-config": "0.0.7"
+  "@infinex/actions": "0.0.7"
+  "@infinex/asset-config": "0.0.7"
+  "@infinex/tailwind-config": "0.0.6"
+  "@infinex/ui": "0.0.7"
+  "@infinex/ui-colors": "0.0.7"
+  "@infinex/ui-css-reset": "0.0.7"
+  "@infinex/ui-fonts": "0.0.7"
+  "@infinex/ckritter": "0.0.7"
+  "@infinex/web-shared": "0.0.7"
+  "@infinex/types": "0.0.7"
+  zod: 3.25.67 # ~3.25 introduces zod/v4 https://zod.dev/v4?id=versioning
+  viem: ^2.30.5

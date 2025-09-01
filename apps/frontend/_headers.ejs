@@ -1,0 +1,7 @@
+
+<% Object.entries(headers).forEach(([path, pathHeaders]) => { -%>
+<%- path %>
+<% pathHeaders.forEach((header) => { -%>
+  <%- header.key %>: <%- header.value %>
+<% }); -%>
+<% }); -%>

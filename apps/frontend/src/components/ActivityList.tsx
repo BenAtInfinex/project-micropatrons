@@ -48,28 +48,28 @@ export const ActivityList: React.FC<ActivityListProps> = ({ refreshTrigger }) =>
   };
 
   return (
-    <div className="activity-list">
-      <h2>Recent Activity</h2>
+    <div className="bg-surface rounded-3xl p-6">
+      <h2 className="title-lg-semibold text-emphasis mb-6">Recent Activity</h2>
       
-      {loading && <div className="loading">Loading activities...</div>}
-      {error && <div className="error">{error}</div>}
+      {loading && <div className="text-center py-8 body-base-normal text-secondary">Loading activities...</div>}
+      {error && <div className="text-center py-8 body-base-normal text-negative">{error}</div>}
       
       {!loading && !error && activities.length === 0 && (
-        <div className="no-activity">No activities yet</div>
+        <div className="text-center py-8 body-base-normal text-secondary italic">No activities yet</div>
       )}
       
       {!loading && !error && activities.length > 0 && (
-        <div className="activities">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto">
           {activities.map((activity) => (
-            <div key={activity.id} className="activity-item">
-              <div className="activity-main">
-                <span className="activity-from">{activity.from_username}</span>
-                <span className="activity-arrow">→</span>
-                <span className="activity-to">{activity.to_username}</span>
+            <div key={activity.id} className="bg-surfaceTwo border border-subtle rounded-xl p-4 hover:border-subtle-hover transition-all">
+              <div className="flex items-center mb-2">
+                <span className="body-base-semibold text-emphasis">{activity.from_username}</span>
+                <span className="mx-2 text-secondary">→</span>
+                <span className="body-base-semibold text-emphasis">{activity.to_username}</span>
               </div>
-              <div className="activity-details">
-                <span className="activity-amount">{formatMicropatrons(activity.amount)}</span>
-                <span className="activity-time">{formatTimestamp(activity.timestamp)}</span>
+              <div className="flex justify-between items-center">
+                <span className="body-sm-normal text-primary">{formatMicropatrons(activity.amount)}</span>
+                <span className="body-xs-normal text-secondary">{formatTimestamp(activity.timestamp)}</span>
               </div>
             </div>
           ))}

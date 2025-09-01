@@ -88,13 +88,13 @@ export const BalanceChart: React.FC<BalanceChartProps> = ({ refreshTrigger }) =>
 
   const options: ChartOptions<'bar'> = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
       },
       title: {
-        display: true,
-        text: 'Top 10 Users by Balance'
+        display: false
       },
       tooltip: {
         callbacks: {
@@ -121,12 +121,19 @@ export const BalanceChart: React.FC<BalanceChartProps> = ({ refreshTrigger }) =>
   };
 
   if (loading || !chartData) {
-    return <div className="loading">Loading balance chart...</div>;
+    return (
+      <div className="bg-surface rounded-3xl p-6 h-full flex items-center justify-center">
+        <div className="body-base-normal text-secondary">Loading balance chart...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="balance-chart">
-      <Bar options={options} data={chartData} />
+    <div className="bg-surface rounded-3xl p-6 h-full">
+      <h3 className="title-base-semibold text-emphasis mb-4">Top 10 Balances</h3>
+      <div className="h-[300px]">
+        <Bar options={options} data={chartData} />
+      </div>
     </div>
   );
 };
