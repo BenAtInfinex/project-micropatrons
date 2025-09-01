@@ -4,6 +4,12 @@ export interface User {
   balance: number;
 }
 
+export interface VictimStats {
+  username: string;
+  victimCount: number;
+  totalLost: number;
+}
+
 export interface Activity {
   id: number;
   from_username: string;

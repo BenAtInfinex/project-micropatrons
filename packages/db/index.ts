@@ -1,7 +1,12 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import crypto from "crypto";
+import path from "path";
+import { fileURLToPath } from 'url';
 import { getDatabase, getDatabaseInfo } from "./src/database.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5173;
@@ -365,7 +370,24 @@ app.get("/api/activity/stats", (req: Request, res: Response) => {
   });
 });
 
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, 'public');
+  app.use(express.static(frontendPath));
+  
+  // Handle React Router - send all non-API requests to index.html
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    }
+  });
+}
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`Serving static files from: ${path.join(__dirname, 'public')}`);
+  }
 });

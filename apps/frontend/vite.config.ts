@@ -19,12 +19,7 @@ export default defineConfig({
       // Add/remove modules as required by your deps.
       include: ["buffer", "process", "events", "util", "stream", "path"],
       // Make sure inspector is not polyfilled/aliased.
-      exclude: [
-        "inspector",
-        "node:inspector",
-        "inspector/promises",
-        "node:inspector/promises",
-      ],
+      exclude: [],
       globals: { Buffer: true, process: true, global: true },
       protocolImports: true,
     }),

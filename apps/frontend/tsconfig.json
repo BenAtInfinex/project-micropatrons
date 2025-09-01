@@ -46,7 +46,9 @@
     "noFallthroughCasesInSwitch": true,
     "types": [
       "vite/client",
-      "chrome"
+      "chrome",
+      "react",
+      "react-dom"
     ],
     "allowUmdGlobalAccess": true,
     "paths": {

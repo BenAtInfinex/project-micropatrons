@@ -1,0 +1,35 @@
+services:
+  # Backend API
+  - type: web
+    name: opsecrun-api
+    runtime: node
+    plan: free
+    buildCommand: cd packages/db && pnpm install && pnpm build
+    startCommand: cd packages/db && pnpm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: sqlite-disk
+      mountPath: /opt/render/project/packages/db
+      sizeGB: 1
+
+  # Frontend
+  - type: web
+    name: opsecrun-frontend  
+    runtime: static
+    plan: free
+    buildCommand: cd apps/frontend && pnpm install && pnpm build
+    staticPublishPath: ./apps/frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://opsecrun-api.onrender.com
+
+databases:
+  # For production, you might want to use PostgreSQL instead of SQLite
+  # - name: opsecrun-db
+  #   plan: free
+  #   databaseName: opsecrun
+  #   user: opsecrun

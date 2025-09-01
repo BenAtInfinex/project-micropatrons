@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - sqlite_data:/app/packages/db/data
+    environment:
+      - NODE_ENV=production
+      - PORT=5173
+    restart: unless-stopped
+
+  # Optional: Add PostgreSQL for production
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_DB: opsecrun
+  #     POSTGRES_USER: opsecrun
+  #     POSTGRES_PASSWORD: your-secure-password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+volumes:
+  sqlite_data:
+  # postgres_data:

@@ -4,9 +4,10 @@ import {
   TransferResponse,
   ErrorResponse,
   Activity,
+  VictimStats,
 } from "../types";
 
-const API_BASE_URL = "http://localhost:5173/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5173/api";
 
 export const api = {
   async getUsers(search?: string): Promise<User[]> {
@@ -74,30 +75,64 @@ export const api = {
     return response.json();
   },
 
-  async getActivityStats(days = 30): Promise<{ date: string; transfers: number; volume: number }[]> {
+  async getActivityStats(
+    days = 30,
+  ): Promise<{ date: string; transfers: number; volume: number }[]> {
     // Mock data for now since the backend doesn't have this endpoint yet
     const stats = [];
     const now = new Date();
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       stats.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split("T")[0],
         transfers: Math.floor(Math.random() * 20) + 5,
         volume: Math.floor(Math.random() * 1000000) + 100000,
       });
     }
-    
+
     return Promise.resolve(stats);
   },
 
-  async reportOpSecIssue(data: { victim: string; attacker: string }): Promise<{ message: string; success: boolean }> {
+  async getVictimStats(): Promise<VictimStats[]> {
+    // Get all activity to analyze OpSec violations
+    const allActivity = await this.getActivity(1000, 0); // Get a large number of activities
+    
+    // OpSec violations are transfers of exactly 20,000 µPatrons
+    const opSecViolations = allActivity.filter(activity => activity.amount === 20000);
+    
+    // Count victims (from_username in OpSec penalty transfers)
+    const victimCounts = new Map<string, { count: number; totalLost: number }>();
+    
+    opSecViolations.forEach(violation => {
+      const victim = violation.from_username;
+      const current = victimCounts.get(victim) || { count: 0, totalLost: 0 };
+      victimCounts.set(victim, {
+        count: current.count + 1,
+        totalLost: current.totalLost + violation.amount
+      });
+    });
+    
+    // Convert to array and sort by victim count descending
+    const victimStats: VictimStats[] = Array.from(victimCounts.entries()).map(([username, stats]) => ({
+      username,
+      victimCount: stats.count,
+      totalLost: stats.totalLost
+    })).sort((a, b) => b.victimCount - a.victimCount);
+    
+    return victimStats;
+  },
+
+  async reportOpSecIssue(data: {
+    victim: string;
+    attacker: string;
+  }): Promise<{ message: string; success: boolean }> {
     // This will transfer 20,000 micropatrons from attacker to victim
     const transferData = {
-      sender: data.attacker,
-      receiver: data.victim,
-      amount: 20000
+      sender: data.victim,
+      receiver: data.attacker,
+      amount: 20000,
     };
 
     const response = await fetch(`${API_BASE_URL}/transfer`, {
@@ -116,7 +151,7 @@ export const api = {
     const result = await response.json();
     return {
       message: `OpSec issue reported successfully. ${data.attacker} has been penalized 20,000 µPatrons which have been transferred to ${data.victim}.`,
-      success: true
+      success: true,
     };
   },
 };

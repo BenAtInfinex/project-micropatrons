@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState, FC } from 'react';
 import { UserSearch } from './UserSearch';
 import { TransferFormData } from '../types';
-import { api } from '../api/api';
+import { useTransfer } from '../hooks/queries';
 
 interface TransferFormProps {
-  onTransferComplete: () => void;
+  onTransferComplete?: () => void; // Keep for compatibility but not needed with TanStack Query
 }
 
 export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }) => {
@@ -13,51 +13,51 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
     receiver: '',
     amount: 0
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const transferMutation = useTransfer();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validation
     if (!formData.sender || !formData.receiver || !formData.amount) {
-      setError('All fields are required');
+      setValidationError('All fields are required');
       return;
     }
 
     if (formData.amount <= 0) {
-      setError('Amount must be greater than 0');
+      setValidationError('Amount must be greater than 0');
       return;
     }
 
     if (!Number.isInteger(formData.amount)) {
-      setError('Amount must be a whole number');
+      setValidationError('Amount must be a whole number');
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    setValidationError(null);
     setSuccess(null);
 
-    try {
-      const response = await api.transfer(formData);
-      setSuccess(response.message);
-      
-      // Reset form
-      setFormData({
-        sender: '',
-        receiver: '',
-        amount: 0
-      });
-      
-      // Notify parent to refresh user list
-      onTransferComplete();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Transfer failed');
-    } finally {
-      setLoading(false);
-    }
+    transferMutation.mutate(formData, {
+      onSuccess: (response) => {
+        setSuccess(response.message);
+        
+        // Reset form
+        setFormData({
+          sender: '',
+          receiver: '',
+          amount: 0
+        });
+        
+        // Notify parent if callback exists
+        onTransferComplete?.();
+      },
+      onError: () => {
+        // Error is handled by the mutation's error state
+      }
+    });
   };
 
   return (
@@ -95,9 +95,9 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
           />
         </div>
 
-        {error && (
+        {(validationError || transferMutation.error) && (
           <div className="bg-negative/10 border border-negative/20 text-negative rounded-xl px-4 py-3 body-sm-normal">
-            {error}
+            {validationError || (transferMutation.error instanceof Error ? transferMutation.error.message : 'Transfer failed')}
           </div>
         )}
         {success && (
@@ -108,10 +108,10 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onTransferComplete }
 
         <button 
           type="submit" 
-          disabled={loading} 
+          disabled={transferMutation.isPending} 
           className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-xl body-base-semibold hover:bg-primary-hover active:bg-primary-pressed disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
-          {loading ? 'Processing...' : 'Transfer'}
+          {transferMutation.isPending ? 'Processing...' : 'Transfer'}
         </button>
       </form>
     </div>
